@@ -21,7 +21,8 @@ contract Schnaps is Ownable {
     }
 
     /// @notice Proceed to a payment using ERC20 token.
-    ///
+    /// @dev Any token is accepted here, but in practice only tokens accepted by the
+    ///      frontend will be *accepted*.
     /// @param token The address of the ERC20 token.
     /// @param amount The amount of the ERC20 token.
     /// @param barcode The barcode of the payment.
