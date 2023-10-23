@@ -10,8 +10,12 @@ contract Schnaps is Ownable {
     // Initialize `owner`.
     constructor(address initialOwner) Ownable(initialOwner) {}
 
+    /// Event emitted when a payment is received. `token` will be set to 0 for ETH.
     // TODO: decide what to put in barcode
     event PaymentReceived(address sender, address token, uint256 amount, bytes barcode);
+
+    // Event emitted when a withdrawal occurs. `token` will be set to 0 for ETH.
+    event Withdrawal(address receiver, address token, uint256 amount);
 
     /// @notice Proceed to a payment using ETH.
     ///
@@ -37,7 +41,7 @@ contract Schnaps is Ownable {
     /// @param amount The amount of ETH to send.
     function withdrawEth(address payable to, uint256 amount) public onlyOwner {
         to.transfer(amount);
-        // TODO: need an event?
+        emit Withdrawal(to, address(0), amount);
     }
 
     /// @notice Withdraw ERC20 token from the contract.
@@ -47,5 +51,6 @@ contract Schnaps is Ownable {
     /// @param amount The amount of ERC20 token to send.
     function withdrawToken(IERC20 token, address to, uint256 amount) public onlyOwner {
         token.safeTransfer(to, amount);
+        emit Withdrawal(to, address(token), amount);
     }
 }
