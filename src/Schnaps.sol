@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.21;
 
 contract Schnaps {
     // create depositEth function
@@ -14,5 +14,4 @@ contract Schnaps {
     // onlyOwner : takes an address
     // create withdrawToken
     // onlyOwner : takes an address
-
 }
