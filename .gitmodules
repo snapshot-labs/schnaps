@@ -6,4 +6,4 @@
 	url = https://github.com/Openzeppelin/openzeppelin-contracts
 [submodule "lib/create3-factory"]
 	path = lib/create3-factory
-	url = https://github.com/ZeframLou/create3-factory
+	url = https://github.com/lifinance/create3-factory
