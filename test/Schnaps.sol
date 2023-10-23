@@ -10,7 +10,6 @@ contract SchnapsTest is Test {
     Schnaps public schnaps;
     address owner = address(0xbeef);
     uint256 amount = 100;
-    uint256 supply = 1000;
     address payable receiver = payable(address(1337));
     bytes barcode = "0xdeadbeef";
     IERC20 token;
@@ -20,21 +19,27 @@ contract SchnapsTest is Test {
 
     function setUp() public {
         schnaps = new Schnaps(owner);
-        token = new TestToken(supply);
-        token.transfer(address(this), amount);
+        token = new TestToken(amount);
         token.approve(address(schnaps), amount);
     }
 
     function test_payWithEth() public {
         vm.expectEmit(true, true, true, true);
         emit PaymentReceived(address(this), address(0), amount, barcode);
+        
+        uint256 balance = address(this).balance;
         schnaps.payWithEth{value: amount}(barcode);
+        uint256 new_balance = address(this).balance;
+
+        assertEq(balance - new_balance, amount);
     }
 
     function test_payWithToken() public {
         vm.expectEmit(true, true, true, true);
         emit PaymentReceived(address(this), address(token), amount, barcode);
+
         schnaps.payWithToken(token, amount, barcode);
+        assertEq(token.balanceOf(address(this)), 0);
     }
 
     function test_withdrawEth() public {
@@ -44,6 +49,8 @@ contract SchnapsTest is Test {
         vm.expectEmit(true, true, true, true);
         emit Withdrawal(receiver, address(0), amount);
         schnaps.withdrawEth(receiver, amount);
+        assertEq(receiver.balance, amount);
+        assertEq(address(schnaps).balance, 0);
     }
 
     function test_withdrawEthUnauthorized() public {
@@ -68,6 +75,8 @@ contract SchnapsTest is Test {
         vm.expectEmit(true, true, true, true);
         emit Withdrawal(receiver, address(token), amount);
         schnaps.withdrawToken(token, receiver, amount);
+
+        assertEq(token.balanceOf(address(schnaps)), 0);
     }
 
     function test_withdrawTokenUnauthorized() public {
