@@ -1,20 +1,35 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.18;
 
-import { Script } from "forge-std/Script.sol";
+pragma solidity ^0.8.21;
 
-import { Schnaps } from "../src/Schnaps.sol";
+import "forge-std/Script.sol";
+import "../src/Schnaps.sol";
+import "../lib/create3-factory/src/ICREATE3Factory.sol";
 
-/// @notice Script to deploy the Schnaps
 contract Deployer is Script {
-    address owner = address(0xc83A9e69012312513328992d454290be85e95101);
+    using stdJson for string;
 
-    function run() public {
+    string internal deployments;
+    string internal deploymentsPath;
+
+    function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        string memory network = vm.envString("NETWORK");
+        address owner = vm.envAddress("OWNER");
+
+        deploymentsPath = string.concat(string.concat("./deployments/", network), ".json");
+
         vm.startBroadcast(deployerPrivateKey);
-    
-        Schnaps schnaps = new Schnaps(owner);
-    
+
+        // Using the CREATE3 factory maintained by lififinance: https://github.com/lifinance/create3-factory
+        address deployed = ICREATE3Factory(0x93FEC2C00BfE902F733B57c5a6CeeD7CD1384AE1).deploy(
+            bytes32(uint256(0)), abi.encodePacked(type(Schnaps).creationCode, abi.encode(owner))
+        );
+
+        deployments = deployments.serialize("Schnaps", deployed);
+
+        deployments.write(deploymentsPath);
+
         vm.stopBroadcast();
     }
 }
