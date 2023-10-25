@@ -1,0 +1,30 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Schnaps
+    network: sepolia
+    source:
+      address: "0x117303a2f3a195C94BBC0bB4979449454b38038D"
+      abi: Schnaps
+      startBlock: 4559446
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - OwnershipTransferred
+        - PaymentReceived
+        - Withdrawal
+      abis:
+        - name: Schnaps
+          file: ./abis/Schnaps.json
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PaymentReceived(address,address,uint256,bytes)
+          handler: handlePaymentReceived
+        - event: Withdrawal(address,address,uint256)
+          handler: handleWithdrawal
+      file: ./src/schnaps.ts

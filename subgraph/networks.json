@@ -1,0 +1,8 @@
+{
+  "sepolia": {
+    "Schnaps": {
+      "address": "0x117303a2f3a195C94BBC0bB4979449454b38038D",
+      "startBlock": 4559446
+    }
+  }
+}
