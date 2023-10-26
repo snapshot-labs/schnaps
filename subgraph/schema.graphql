@@ -12,7 +12,7 @@ type PaymentReceived @entity(immutable: true) {
   sender: Bytes! # address
   token: Bytes! # address
   amount: BigInt! # uint256
-  barcode: Bytes! # bytes
+  barcode: String! 
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

@@ -32,7 +32,7 @@ export function handlePaymentReceived(event: PaymentReceivedEvent): void {
   entity.sender = event.params.sender
   entity.token = event.params.token
   entity.amount = event.params.amount
-  entity.barcode = event.params.barcode
+  entity.barcode = event.params.barcode.toString()
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
