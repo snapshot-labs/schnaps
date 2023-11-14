@@ -12,9 +12,6 @@ import {SafeERC20} from "openzeppelin-contracts/contracts/token/ERC20/utils/Safe
 contract Schnaps is Ownable {
     using SafeERC20 for IERC20;
 
-    /// @dev Constructor.
-    constructor(address initialOwner) Ownable(initialOwner) {}
-
     /// @notice Emitted when a payment is received.
     /// @param  sender The address of the sender.
     /// @param  token The address of the token used for payment.
@@ -29,6 +26,9 @@ contract Schnaps is Ownable {
     ///               It will be set to the zero address if the native token of the chain is used.
     /// @param  amount The amount of the token withdrawn.
     event Withdrawal(address recipient, address token, uint256 amount);
+
+    /// @dev Constructor.
+    constructor(address initialOwner) Ownable(initialOwner) {}
 
     /// @notice Makes a payment using the native token of the chain.
     /// @param barcode The barcode of the payment.
