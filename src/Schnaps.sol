@@ -27,6 +27,9 @@ contract Schnaps is Ownable {
     /// @param  amount The amount of the token withdrawn.
     event Withdrawal(address recipient, address token, uint256 amount);
 
+    /// @notice Thrown when the contract does not have a sufficient native token balance to perform a withdrawal.
+    error InsufficientBalance();
+
     /// @dev Constructor.
     constructor(address initialOwner) Ownable(initialOwner) {}
 
@@ -49,8 +52,11 @@ contract Schnaps is Ownable {
     /// @param recipient The address of the recipient of the withdrawal.
     /// @param amount The amount of the native token to withdraw.
     function withdrawNativeToken(address payable recipient, uint256 amount) external onlyOwner {
-        to.transfer(amount);
-        emit Withdrawal(to, address(0), amount);
+        if (amount > address(this).balance) {
+            revert InsufficientBalance();
+        }
+        recipient.transfer(amount);
+        emit Withdrawal(recipient, address(0), amount);
     }
 
     /// @notice Withdraws ERC20 tokens from the contract.
@@ -58,7 +64,7 @@ contract Schnaps is Ownable {
     /// @param recipient The address of the recipient of the withdrawal.
     /// @param amount The amount of the token to withdraw.
     function withdrawERC20Token(IERC20 token, address recipient, uint256 amount) external onlyOwner {
-        token.safeTransfer(to, amount);
-        emit Withdrawal(to, address(token), amount);
+        token.safeTransfer(recipient, amount);
+        emit Withdrawal(recipient, address(token), amount);
     }
 }
