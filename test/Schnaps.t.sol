@@ -3,7 +3,7 @@ pragma solidity ^0.8.21;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {Schnaps} from "../src/Schnaps.sol";
-import {TestToken} from "./mock.sol";
+import {MockERC20} from "./MockERC20.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract SchnapsTest is Test {
@@ -23,7 +23,7 @@ contract SchnapsTest is Test {
 
     function setUp() public {
         schnaps = new Schnaps(owner);
-        token = new TestToken(amount);
+        token = new MockERC20(amount);
         token.approve(address(schnaps), amount);
     }
 
