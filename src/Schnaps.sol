@@ -21,7 +21,7 @@ contract Schnaps is Ownable {
     /// @notice Proceed to a payment using ETH.
     ///
     /// @param barcode The barcode of the payment.
-    function payWithEth(bytes calldata barcode) public payable {
+    function payWithEth(bytes calldata barcode) external payable {
         emit PaymentReceived(msg.sender, address(0), msg.value, barcode);
     }
 
@@ -31,7 +31,7 @@ contract Schnaps is Ownable {
     /// @param token The address of the ERC20 token.
     /// @param amount The amount of the ERC20 token.
     /// @param barcode The barcode of the payment.
-    function payWithToken(IERC20 token, uint256 amount, bytes calldata barcode) public {
+    function payWithToken(IERC20 token, uint256 amount, bytes calldata barcode) external {
         token.safeTransferFrom(msg.sender, address(this), amount);
         emit PaymentReceived(msg.sender, address(token), amount, barcode);
     }
@@ -40,7 +40,7 @@ contract Schnaps is Ownable {
     ///
     /// @param to The address to send ETH to.
     /// @param amount The amount of ETH to send.
-    function withdrawEth(address payable to, uint256 amount) public onlyOwner {
+    function withdrawEth(address payable to, uint256 amount) external onlyOwner {
         to.transfer(amount);
         emit Withdrawal(to, address(0), amount);
     }
@@ -50,7 +50,7 @@ contract Schnaps is Ownable {
     /// @param token The address of the ERC20 token.
     /// @param to The address to send ERC20 token to.
     /// @param amount The amount of ERC20 token to send.
-    function withdrawToken(IERC20 token, address to, uint256 amount) public onlyOwner {
+    function withdrawToken(IERC20 token, address to, uint256 amount) external onlyOwner {
         token.safeTransfer(to, amount);
         emit Withdrawal(to, address(token), amount);
     }
