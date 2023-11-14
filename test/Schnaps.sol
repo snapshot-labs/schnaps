@@ -17,80 +17,84 @@ contract SchnapsTest is Test {
     event PaymentReceived(address sender, address token, uint256 amount, bytes barcode);
     event Withdrawal(address receiver, address token, uint256 amount);
 
+    error InsufficientBalance();
+    error OwnableUnauthorizedAccount(address account);
+    error ERC20InsufficientBalance(address sender, uint256 balance, uint256 needed);
+
     function setUp() public {
         schnaps = new Schnaps(owner);
         token = new TestToken(amount);
         token.approve(address(schnaps), amount);
     }
 
-    function test_payWithEth() public {
+    function test_payWithNativeToken() public {
         vm.expectEmit(true, true, true, true);
         emit PaymentReceived(address(this), address(0), amount, barcode);
 
         uint256 balance = address(this).balance;
-        schnaps.payWithEth{value: amount}(barcode);
-        uint256 new_balance = address(this).balance;
+        schnaps.payWithNativeToken{value: amount}(barcode);
+        uint256 newBalance = address(this).balance;
 
-        assertEq(balance - new_balance, amount);
+        assertEq(balance - newBalance, amount);
     }
 
-    function test_payWithToken() public {
+    function test_payWithERC20Token() public {
         vm.expectEmit(true, true, true, true);
         emit PaymentReceived(address(this), address(token), amount, barcode);
 
-        schnaps.payWithToken(token, amount, barcode);
+        schnaps.payWithERC20Token(token, amount, barcode);
         assertEq(token.balanceOf(address(this)), 0);
     }
 
-    function test_withdrawEth() public {
-        schnaps.payWithEth{value: amount}(barcode);
+    function test_withdrawNativeToken() public {
+        schnaps.payWithNativeToken{value: amount}(barcode);
 
         vm.prank(owner);
         vm.expectEmit(true, true, true, true);
         emit Withdrawal(receiver, address(0), amount);
-        schnaps.withdrawEth(receiver, amount);
+        schnaps.withdrawNativeToken(receiver, amount);
         assertEq(receiver.balance, amount);
         assertEq(address(schnaps).balance, 0);
     }
 
-    function test_withdrawEthUnauthorized() public {
-        schnaps.payWithEth{value: amount}(barcode);
+    function test_withdrawNativeTokenUnauthorized() public {
+        schnaps.payWithNativeToken{value: amount}(barcode);
 
-        vm.expectRevert();
-        schnaps.withdrawEth(receiver, amount);
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(this)));
+        schnaps.withdrawNativeToken(receiver, amount);
     }
 
-    function test_withdrawEthTooMuch() public {
-        schnaps.payWithEth{value: amount}(barcode);
+    function test_withdrawNativeTokenTooMuch() public {
+        schnaps.payWithNativeToken{value: amount}(barcode);
 
         vm.prank(owner);
-        vm.expectRevert();
-        schnaps.withdrawEth(receiver, amount + 1);
+        vm.expectRevert(InsufficientBalance.selector);
+        schnaps.withdrawNativeToken(receiver, amount + 1);
     }
 
-    function test_withdrawToken() public {
-        schnaps.payWithToken(token, amount, barcode);
+    function test_withdrawERC20Token() public {
+        schnaps.payWithERC20Token(token, amount, barcode);
 
         vm.prank(owner);
         vm.expectEmit(true, true, true, true);
         emit Withdrawal(receiver, address(token), amount);
-        schnaps.withdrawToken(token, receiver, amount);
+        schnaps.withdrawERC20Token(token, receiver, amount);
 
         assertEq(token.balanceOf(address(schnaps)), 0);
     }
 
-    function test_withdrawTokenUnauthorized() public {
-        schnaps.payWithToken(token, amount, barcode);
+    function test_withdrawERC20TokenUnauthorized() public {
+        schnaps.payWithERC20Token(token, amount, barcode);
 
-        vm.expectRevert();
-        schnaps.withdrawToken(token, receiver, amount);
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(this)));
+        schnaps.withdrawERC20Token(token, receiver, amount);
     }
 
-    function test_withdrawTokenTooMuch() public {
-        schnaps.payWithToken(token, amount, barcode);
+    function test_withdrawERC20TokenTooMuch() public {
+        schnaps.payWithERC20Token(token, amount, barcode);
 
         vm.prank(owner);
-        vm.expectRevert();
-        schnaps.withdrawToken(token, receiver, amount + 1);
+        vm.expectRevert(abi.encodeWithSelector(ERC20InsufficientBalance.selector, address(schnaps), amount, amount + 1));
+        schnaps.withdrawERC20Token(token, receiver, amount + 1);
     }
 }
