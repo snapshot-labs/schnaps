@@ -28,6 +28,10 @@ jobs:
         with:
           version: nightly
 
+      - name: Formatting
+        run: |
+          forge fmt
+          
       - name: Run Forge build
         run: |
           forge --version
