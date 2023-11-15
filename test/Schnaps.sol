@@ -3,8 +3,8 @@ pragma solidity ^0.8.21;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {Schnaps} from "../src/Schnaps.sol";
-import { TestToken } from "./mock.sol";
-import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
+import {TestToken} from "./mock.sol";
+import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract SchnapsTest is Test {
     Schnaps public schnaps;
@@ -26,7 +26,7 @@ contract SchnapsTest is Test {
     function test_payWithEth() public {
         vm.expectEmit(true, true, true, true);
         emit PaymentReceived(address(this), address(0), amount, barcode);
-        
+
         uint256 balance = address(this).balance;
         schnaps.payWithEth{value: amount}(barcode);
         uint256 new_balance = address(this).balance;
