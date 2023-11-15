@@ -4,7 +4,10 @@ pragma solidity ^0.8.21;
 
 import "forge-std/Script.sol";
 import "../src/Schnaps.sol";
-import "../lib/create3-factory/src/ICREATE3Factory.sol";
+
+interface ICREATE3Factory {
+    function deploy(bytes32 salt, bytes memory bytecode) external returns (address deployedAddress);
+}
 
 contract Deployer is Script {
     using stdJson for string;
