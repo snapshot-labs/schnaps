@@ -9,9 +9,11 @@ type OwnershipTransferred @entity(immutable: true) {
 
 type PaymentReceived @entity(immutable: true) {
   id: Bytes!
+  network: String!
   sender: Bytes! # address
   token: Bytes! # address
   amount: BigInt! # uint256
+  usdValue: BigDecimal!
   barcode: String! 
   blockNumber: BigInt!
   blockTimestamp: BigInt!
