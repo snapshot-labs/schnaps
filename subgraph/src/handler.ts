@@ -1,6 +1,6 @@
 import { BigInt, BigDecimal, Bytes, ethereum, log, Address, dataSource } from "@graphprotocol/graph-ts"
 import { getUsdPrice } from "./prices"
-import {ETH_ADDRESS}  from "./prices/config/mainnet";
+import {WETH_ADDRESS, WETH_TOKEN_DECIMALS, ETH_ADDRESS, WMATIC_TOKEN_DECIMALS,USDC_ADDRESS, USDC_E_ADDRESS, USDC_TOKEN_DECIMALS}  from "./prices/config/polygon";
 
 import {
   OwnershipTransferred as OwnershipTransferredEvent,
@@ -34,21 +34,17 @@ export function handlePaymentReceived(event: PaymentReceivedEvent): void {
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
 
-  let usdValue = BigDecimal.fromString("1234")
-  if (event.params.token == Address.zero()) {
-    usdValue = getUsdPrice(ETH_ADDRESS, bigIntToBigDecimal(event.params.amount))
-  } else if (event.params.token == Address.fromString("0x2791bca1f2de4661ed88a30c99a7a9449aa84174")) {
-    usdValue = getUsdPrice(event.params.token, bigIntToBigDecimal(event.params.amount, 6))
-  } else {
-    usdValue = getUsdPrice(event.params.token, bigIntToBigDecimal(event.params.amount))
-  }
+  let usdValue = getUsdValue(event.params.token, event.params.amount)
+
+  let encoded = event.params.barcode.toString()
+  let chunks = encoded.split(":")
 
   entity.network = dataSource.network()
   entity.sender = event.params.sender
   entity.token = event.params.token
   entity.amount = event.params.amount
   entity.usdValue = usdValue
-  entity.barcode = event.params.barcode.toString()
+  entity.barcode = chunks[0]
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -70,6 +66,23 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+}
+
+function getUsdValue(token: Address, amount: BigInt): BigDecimal {
+  let usdValue = BigDecimal.fromString("0")
+  if (token == Address.zero() || token == WETH_ADDRESS) {
+    // Token is MATIC/WMATIC
+    // TODO: rename WETH_ADDRESS to WMATIC_ADDRESS
+    usdValue = getUsdPrice(WETH_ADDRESS, bigIntToBigDecimal(amount, WMATIC_TOKEN_DECIMALS))
+  } else if (token == USDC_ADDRESS || token == USDC_E_ADDRESS) {
+    // Token is USDC/USDC.e
+    usdValue = getUsdPrice(USDC_E_ADDRESS, bigIntToBigDecimal(amount, USDC_TOKEN_DECIMALS))
+  } else if (token == ETH_ADDRESS) {
+    // Token is WETH
+    usdValue = getUsdPrice(ETH_ADDRESS, bigIntToBigDecimal(amount, 18))
+  }
+  // If the token is unknown, it will be priced  at zero
+  return usdValue
 }
 
 export function bigIntToBigDecimal(
