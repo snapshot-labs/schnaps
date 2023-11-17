@@ -57,17 +57,26 @@ export const HARDCODED_STABLES: Address[] = [];
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
-
+// TODO: price is wrong with WETH, need to figure out why. Think its returning WMATIC price instead.
+// WETH
 export const ETH_ADDRESS = Address.fromString(
   "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619"
 );
+export const WETH_TOKEN_DECIMALS = 18;
+
+// WMATIC
 export const WETH_ADDRESS = Address.fromString(
   "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"
 );
-export const USDC_ADDRESS = Address.fromString(
+export const WMATIC_TOKEN_DECIMALS = 18;
+
+export const USDC_E_ADDRESS = Address.fromString(
   "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
 );
+export const USDC_ADDRESS = Address.fromString(
+  "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359"
+);
+export const USDC_TOKEN_DECIMALS = 6;
 
 export class config implements Configurations {
   network(): string {
@@ -123,11 +132,11 @@ export class config implements Configurations {
     return WETH_ADDRESS;
   }
   usdcAddress(): Address {
-    return USDC_ADDRESS;
+    return USDC_E_ADDRESS;
   }
 
   usdcTokenDecimals(): BigInt {
-    return USDC_TOKEN_DECIMALS;
+    return BigInt.fromI32(USDC_TOKEN_DECIMALS);
   }
 
   getOracleOverride(
