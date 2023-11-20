@@ -53,7 +53,6 @@ export function handlePaymentReceived(event: PaymentReceivedEvent): void {
 
   // Added the network here in case we index Schnaps on multiple networks in the same database. Not sure whether thats possible though
   entity.network = dataSource.network()
-
   entity.sender = event.params.sender
   entity.token = event.params.token
   entity.amount = event.params.amount
