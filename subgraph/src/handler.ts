@@ -34,18 +34,33 @@ export function handlePaymentReceived(event: PaymentReceivedEvent): void {
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
 
+  // Calculates the usd value of the token payment based on the current price of the token.
+  // If the token is not supported in the config, it will return 0.
   let usdValue = getUsdValue(event.params.token, event.params.amount)
 
-  let encoded = event.params.barcode.toString()
-  let chunks = encoded.split(":")
+  // Barcode is not valid if its not of the form {type}:{user}:{duration}
+  // TODO: maybe we should still index invalid barcodes - this way it would be easier to handle refunds.
+  let decodedBarcode = event.params.barcode.toString().split(":")
+  if (decodedBarcode.length != 3) {
+    return
+  }
+  // Payment type string
+  let type = decodedBarcode[0]
+  // Address, ens, or other identifier of the user the payment is associated with
+  let user = decodedBarcode[1]
+  // Duration of payment in months
+  let duration = decodedBarcode[2]
 
+  // Added the network here in case we index Schnaps on multiple networks in the same database. Not sure whether thats possible though
   entity.network = dataSource.network()
+
   entity.sender = event.params.sender
   entity.token = event.params.token
   entity.amount = event.params.amount
   entity.usdValue = usdValue
-  entity.barcode = chunks[0]
-
+  entity.type = type
+  entity.user = user
+  entity.duration = duration
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
   entity.transactionHash = event.transaction.hash
@@ -83,6 +98,11 @@ function getUsdValue(token: Address, amount: BigInt): BigDecimal {
   }
   // If the token is unknown, it will be priced  at zero
   return usdValue
+}
+
+function decodeBarcode(barcode: Bytes): (string, string, string) {
+
+  return barcode.toString().split(":")
 }
 
 export function bigIntToBigDecimal(
