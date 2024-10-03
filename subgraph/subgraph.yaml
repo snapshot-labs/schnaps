@@ -1,0 +1,66 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Schnaps
+    network: matic
+    source:
+      address: "0xE91123eE728Cb34a3214B781DB89dff5c86b145c"
+      abi: Schnaps
+      startBlock: 50017203
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - OwnershipTransferred
+        - PaymentReceived
+        - Withdrawal
+      abis:
+        - name: Schnaps
+          file: ./abis/Schnaps.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Curve/Pool.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PaymentReceived(address,address,uint256,bytes)
+          handler: handlePaymentReceived
+        - event: Withdrawal(address,address,uint256)
+          handler: handleWithdrawal
+      file: ./src/handler.ts
+
+
