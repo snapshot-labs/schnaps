@@ -18,7 +18,7 @@ contract Schnaps is Ownable {
     ///               It will be set to the zero address if the native token of the chain is used.
     /// @param  amount The amount of the token used for payment.
     /// @param  barcode The barcode of the payment.
-    event PaymentReceived(address sender, address token, uint256 amount, bytes barcode);
+    event PaymentReceived(address sender, address token, uint256 amount, string barcode);
 
     /// @notice Emitted when a withdrawal occurs.
     /// @param  recipient The address of the recipient of the withdrawal.
@@ -35,7 +35,7 @@ contract Schnaps is Ownable {
 
     /// @notice Makes a payment using the native token of the chain.
     /// @param barcode The barcode of the payment.
-    function payWithNativeToken(bytes calldata barcode) external payable {
+    function payWithNativeToken(string calldata barcode) external payable {
         emit PaymentReceived(msg.sender, address(0), msg.value, barcode);
     }
 
@@ -43,7 +43,7 @@ contract Schnaps is Ownable {
     /// @param token The address of the token.
     /// @param amount The amount of the token.
     /// @param barcode The barcode of the payment.
-    function payWithERC20Token(IERC20 token, uint256 amount, bytes calldata barcode) external {
+    function payWithERC20Token(IERC20 token, uint256 amount, string calldata barcode) external {
         token.safeTransferFrom(msg.sender, address(this), amount);
         emit PaymentReceived(msg.sender, address(token), amount, barcode);
     }
