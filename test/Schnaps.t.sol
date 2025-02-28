@@ -11,10 +11,10 @@ contract SchnapsTest is Test {
     address owner = address(0xbeef);
     uint256 amount = 100;
     address payable receiver = payable(address(1337));
-    bytes barcode = "0xdeadbeef";
+    string barcode = "snapshot.box";
     IERC20 token;
 
-    event PaymentReceived(address sender, address token, uint256 amount, bytes barcode);
+    event PaymentReceived(address sender, address token, uint256 amount, string barcode);
     event Withdrawal(address receiver, address token, uint256 amount);
 
     error InsufficientBalance();
