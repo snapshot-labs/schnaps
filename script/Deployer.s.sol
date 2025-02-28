@@ -22,7 +22,7 @@ contract Deployer is Script {
 
         // We use the latest commit hash as the salt for CREATE3 deployment
         // Prepended with `00` to remove any solc warning.
-        uint256 LATEST_COMMIT = 0x00b382240c00c8d079fcfd2837de873b60ecf062d6;
+        uint256 LATEST_COMMIT = 0x001c4e0dc5f4b21c01f2c189357c0cf3f9f282f5cc;
 
         deploymentsPath = string.concat(string.concat("./deployments/", network), ".json");
 
